@@ -24,8 +24,14 @@ import { AuthModule } from './auth/auth.module';
         password: configService.get('DB_PASSWORD', 'root'),
         database: configService.get('DB_DATABASE', 'blog'),
         timezone: '+12:00',
-        autoLoadEntities: true, // 自动加载通过 forFeature 注册的实体
-        synchronize: configService.get('DB_SYNC', 'false') === 'true', // 只在开发环境打开
+        autoLoadEntities: true,
+
+        // 先让 TypeORM 自动建表
+        synchronize: true,
+
+        // 暂时关掉 migration
+        migrations: [],
+        migrationsRun: false,
       }),
     }),
 

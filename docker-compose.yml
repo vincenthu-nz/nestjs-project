@@ -1,41 +1,32 @@
-version: '3.9'
-
 services:
-  api:
-    build: .
-    container_name: nest-api
-    restart: unless-stopped
+  db:
+    image: mysql:8.0
+    container_name: nest-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword      # root 的密码，你随便改成强一点的也行
+      MYSQL_DATABASE: blog                   # 启动时自动创建 blog 库
+      MYSQL_USER: nest_user                  # 普通用户
+      MYSQL_PASSWORD: VH520Avril             # 普通用户密码
+    ports:
+      - "3306:3306"                          # 如果你本机已有 MySQL 占着 3306，可以改成 "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    command: ["--default-authentication-plugin=mysql_native_password"]
 
-    # 映射端口：本机 3000 -> 容器 3000
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nest-project-api
+    restart: always
+    env_file:
+      - .env                                  # 让 Nest 读这里的环境变量
+    depends_on:
+      - db
     ports:
       - "3000:3000"
-
-    # 从 .env.local 文件读取环境变量
-    env_file:
-      - .env.local
-
-    # 确保数据库先启动
-    depends_on:
-      - postgres
-
-  postgres:
-    image: postgres:16-alpine
-    container_name: nest-postgres
-    restart: unless-stopped
-
-    # 数据库账号配置，来自 .env.local
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-
-    # 映射本机端口：可以用本机客户端连这个 Postgres
-    ports:
-      - "5432:5432"
-
-    # 持久化数据
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+    command: ["node", "dist/src/main.js"]
 
 volumes:
-  postgres_data:
+  db_data:
