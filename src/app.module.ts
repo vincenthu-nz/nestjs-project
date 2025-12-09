@@ -6,15 +6,14 @@ import { AppService } from './app.service';
 import { PostsModule } from './posts/posts.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
-import { parseEnv } from 'config/env';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: parseEnv(),
+      envFilePath: ['.env.local', '.env'], // 本地开发用
+      ignoreEnvFile: process.env.NODE_ENV === 'production', // 生产环境（App Runner）只用环境变量
     }),
-
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
