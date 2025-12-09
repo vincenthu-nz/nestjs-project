@@ -6,12 +6,13 @@ import { AppService } from './app.service';
 import { PostsModule } from './posts/posts.module';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
+import { parseEnv } from 'config/env';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [`.env.${process.env.NODE_ENV || 'dev'}`, '.env.local'],
+      envFilePath: parseEnv(),
     }),
 
     TypeOrmModule.forRootAsync({
