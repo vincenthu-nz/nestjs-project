@@ -18,7 +18,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: nest-project-api-vpc
+    container_name: nest-project-api
     restart: always
     env_file:
       - .env                                  # 让 Nest 读这里的环境变量
