@@ -16,22 +16,18 @@ import { AuthModule } from './auth/auth.module';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: () => ({
         type: 'mysql',
-        host: configService.get('DB_HOST', 'localhost'),
-        port: configService.get<number>('DB_PORT', 3306),
-        username: configService.get('DB_USER', 'root'),
-        password: configService.get('DB_PASSWORD', 'root'),
-        database: configService.get('DB_DATABASE', 'blog'),
-        timezone: '+12:00',
+        host: process.env.DB_HOST, // nest-mysql-nz.mysql.database.azure.com
+        port: Number(process.env.DB_PORT) || 3306,
+        username: process.env.DB_USER, // nest_user@nest-mysql-nz
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_DATABASE, // blog
         autoLoadEntities: true,
-
-        // 先让 TypeORM 自动建表
-        synchronize: true,
-
-        // 暂时关掉 migration
-        migrations: [],
-        migrationsRun: false,
+        synchronize: true, // 之后上生产可以改成 false
+        ssl: {
+          rejectUnauthorized: false, // Azure MySQL 需要 SSL，否则会拒绝
+        },
       }),
     }),
 
