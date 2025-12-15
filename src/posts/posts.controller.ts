@@ -12,54 +12,57 @@ import {
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreatePostDto } from '../dto/create-post.dot';
 
-@ApiTags('文章管理')
+@ApiTags('Post Management')
 @Controller('post')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   /**
-   * 创建文章
+   * Create a new post
    * @param post
    */
-  @ApiOperation({ summary: '创建文章' })
+  @ApiOperation({ summary: 'Create post' })
   @Post()
   async create(@Body() post: CreatePostDto) {
     return await this.postsService.create(post);
   }
 
   /**
-   * 获取所有文章
+   * Get all posts
    */
-  @ApiOperation({ summary: '获取文章列表' })
+  @ApiOperation({ summary: 'Get post list' })
   @Get()
   async findAll(@Query() query): Promise<PostsRo> {
     return await this.postsService.findAll(query);
   }
 
   /**
-   * 获取指定文章
+   * Get post by ID
    * @param id
    */
+  @ApiOperation({ summary: 'Get post by ID' })
   @Get(':id')
   async findById(@Param('id') id) {
     return await this.postsService.findById(id);
   }
 
   /**
-   * 更新文章
+   * Update post
    * @param id
    * @param post
    */
+  @ApiOperation({ summary: 'Update post' })
   @Put(':id')
   async update(@Param('id') id, @Body() post) {
     return await this.postsService.updateById(id, post);
   }
 
   /**
-   * 删除
+   * Delete post
    * @param id
    */
-  @Delete('id')
+  @ApiOperation({ summary: 'Delete post' })
+  @Delete(':id')
   async remove(@Param('id') id) {
     return await this.postsService.remove(id);
   }

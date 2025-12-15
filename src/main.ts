@@ -4,6 +4,7 @@ import { HttpExceptionFilter } from './core/filter/http-exception/http-exception
 import { TransformInterceptor } from './core/interceptor/transform/transform.interceptor';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,16 +19,22 @@ async function bootstrap() {
     }),
   );
 
-  // 设置swagger文档
+  app.use(cookieParser());
+
+  app.enableCors({
+    origin: 'http://localhost:5173',
+    credentials: true,
+  });
+
   const config = new DocumentBuilder()
-    .setTitle('管理后台')
-    .setDescription('管理后台接口文档')
+    .setTitle('Admin Panel')
+    .setDescription('API documentation for the administration system')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('docs', app, document);
 
-  await app.listen(process.env.PORT || 3000, '0.0.0.0');
+  await app.listen(process.env.PORT || 8080, '0.0.0.0');
 }
 bootstrap();

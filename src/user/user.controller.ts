@@ -12,15 +12,15 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @UseInterceptors(ClassSerializerInterceptor)
-  @ApiOperation({ summary: '注册用户' })
+  @ApiOperation({ summary: 'Register' })
   @ApiResponse({ status: 201, type: [UserEntity] })
   @Post('register')
   register(@Body() createUser: CreateUserDto) {
     return this.userService.register(createUser);
   }
 
-  @ApiOperation({ summary: '获取用户信息' })
-  @ApiBearerAuth() // swagger文档设置token
+  @ApiOperation({ summary: 'Get user info' })
+  @ApiBearerAuth()
   @UseGuards(AuthGuard('jwt'))
   @Get()
   fetchUserInfo(@Req() req: RequestWithUser) {

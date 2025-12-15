@@ -1,34 +1,54 @@
-import { InjectRepository } from '@nestjs/typeorm';
-import { ConfigService } from '@nestjs/config';
-import { UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import {
-  Strategy,
   ExtractJwt,
+  Strategy,
   StrategyOptionsWithoutRequest,
 } from 'passport-jwt';
-import { UserEntity } from '../user/entities/user.entity';
-import { AuthService } from './auth.service';
+import { Request } from 'express';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { ConfigService } from '@nestjs/config';
+import { UserEntity } from '../user/entities/user.entity';
 
+type JwtPayload = {
+  id: string;
+  username: string;
+  role: string;
+  iat?: number;
+  exp?: number;
+};
+
+@Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
     private readonly configService: ConfigService,
-    private readonly authService: AuthService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: configService.get('SECRET'),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request) => {
+          const auth = req.headers.authorization;
+          if (auth?.startsWith('Bearer ')) return auth.slice(7);
+          return req.cookies?.['access_token'];
+        },
+      ]),
+      secretOrKey: configService.get<string>('SECRET'),
+      ignoreExpiration: false,
     } as StrategyOptionsWithoutRequest);
   }
 
-  validate(user: UserEntity) {
-    const existUser = this.authService.login(user);
-    if (!existUser) {
-      throw new UnauthorizedException('token不正确');
+  async validate(payload: JwtPayload) {
+    const user = await this.userRepository.findOne({
+      where: { id: payload.id },
+      select: ['id', 'username', 'role'],
+    });
+
+    if (!user) {
+      throw new UnauthorizedException('token invalid or user not exists');
     }
-    return existUser;
+
+    return user;
   }
 }

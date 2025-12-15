@@ -25,11 +25,11 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
       .getOne();
 
     if (!user) {
-      throw new BadRequestException('用户名不正确！');
+      throw new BadRequestException('username incorrect！');
     }
 
     if (!compareSync(password, user.password)) {
-      throw new BadRequestException('密码错误！');
+      throw new BadRequestException('password error！');
     }
 
     return user;

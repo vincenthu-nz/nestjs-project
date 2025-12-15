@@ -27,10 +27,10 @@ export class PostsEntity {
   likeCount: number;
 
   @Column({ type: 'tinyint', name: 'is_recommend', default: 0 })
-  isRecommend: number; // 0: 不推荐, 1: 推荐
+  isRecommend: number;
 
   @Column({ type: 'varchar', name: 'status', nullable: true })
-  status: string; // 如果 enum 的取值你知道，可以改成 enum 映射
+  status: string;
 
   @Column({ type: 'timestamp', name: 'publish_time', nullable: true })
   publishTime: Date;
