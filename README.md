@@ -2,97 +2,147 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+# NestJS Blog API (NestJS + TypeORM)
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+A backend API built with **NestJS** using a **global response transform interceptor** and **global HTTP exception filter** to enforce a consistent response shape.
 
-## Description
+This repository includes **Dockerfile** and **docker-compose.yml** for local development/deployment.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+---
 
-## Project setup
+## ✨ Key Features
 
-```bash
-$ pnpm install
+* 🚀 **NestJS** modular structure
+* 🗄️ **TypeORM** (`data-source.ts`) for database connection and migrations
+* 🧩 Domain modules: **auth**, **user**, **posts**
+* 🧱 **Global response wrapper** via `src/core/interceptor/transform`
+* ❌ **Global exception handling** via `src/core/filter/http-exception`
+* ⚙️ Environment config via `.env` / `.env.local`
+* 🐳 Docker support (Dockerfile + docker-compose)
+
+---
+
+## 📂 Project Structure
+
+```
+src/
+├── auth/                          # Auth module (e.g. login/register, JWT, guards/strategy)
+├── user/                          # User module
+├── posts/                         # Posts module
+├── dto/                           # Shared DTOs (if any)
+├── core/
+│   ├── interceptor/
+│   │   └── transform/             # Response transform interceptor
+│   └── filter/
+│       └── http-exception/        # HTTP exception filter
+├── app.module.ts
+├── main.ts
+└── app.controller.ts
+
+data-source.ts                      # TypeORM DataSource (migrations/config)
+
+docker-compose.yml                  # Local stack (API + DB, etc.)
+Dockerfile                          # Container build
 ```
 
-## Compile and run the project
+---
 
-```bash
-# development
-$ pnpm run start
+## 📡 API Response Format
 
-# watch mode
-$ pnpm run start:dev
+All endpoints are wrapped into a consistent structure by the **transform interceptor**.
 
-# production mode
-$ pnpm run start:prod
+Example:
+
+```json
+{
+  "code": 0,
+  "message": "ok",
+  "data": {}
+}
 ```
 
-## Run tests
+* `code === 0`: success
+* `code !== 0`: business / validation error
 
-```bash
-# unit tests
-$ pnpm run test
+> The **HTTP exception filter** ensures thrown exceptions are also converted into the same response shape.
 
-# e2e tests
-$ pnpm run test:e2e
+---
 
-# test coverage
-$ pnpm run test:cov
+## ⚙️ Environment Variables
+
+Create `.env.local` (recommended for local dev) or `.env` (for production-like runs).
+
+Example:
+
+```env
+PORT=3000
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=nest_user
+DB_PASSWORD=Abc123456?
+DB_DATABASE=blog
+SECRET=Def123456?
 ```
 
-## Deployment
+> Names may vary depending on your `data-source.ts` / config loader. Keep them consistent with your code.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+---
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+## ▶️ Run Locally
+
+### Install
 
 ```bash
-$ pnpm install -g mau
-$ mau deploy
+pnpm install
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Development
 
-## Resources
+```bash
+pnpm start:dev
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+### Build & Production
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+pnpm build
+pnpm start:prod
+```
 
-## Support
+---
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## 🐳 Docker
 
-## Stay in touch
+### Start with docker-compose
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+docker compose up -d
+```
+
+### Rebuild
+
+```bash
+docker compose up -d --build
+```
+
+---
+
+## 🧪 Tests
+
+```bash
+pnpm test
+pnpm test:e2e
+```
+
+---
+
+## Notes
+
+* If you run into character set issues (e.g. Chinese usernames), ensure your **table/columns** are `utf8mb4` (database default alone is not enough).
+* The response format is enforced centrally; the frontend can reliably handle `code/message/data`.
+
+---
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+MIT
