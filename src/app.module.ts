@@ -17,12 +17,6 @@ import { AuthModule } from './auth/auth.module';
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: () => {
-        console.log('ENV CHECK:', {
-          host: process.env.DB_HOST,
-          user: process.env.DB_USER,
-          pass: process.env.DB_PASSWORD,
-        });
-
         return {
           type: 'mysql',
           host: process.env.DB_HOST,
