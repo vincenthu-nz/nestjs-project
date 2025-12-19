@@ -8,6 +8,6 @@ export default new DataSource({
   username: 'nest_user',
   password: 'VH520Avril',
   database: 'blog',
-  entities: ['src/**/*.entity.ts'],
+  entities: ['src/**/*.entities.ts'],
   migrations: ['src/migrations/*.ts'],
 });
